@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Моя студия: проверка</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 16px; background: #111; color: #eee; }
+  input, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; border-radius: 8px; border: 0; box-sizing: border-box; }
+  button { background: #2f7bff; color: #fff; }
+  #result { margin-top: 16px; line-height: 1.5; word-break: break-word; }
+</style>
+</head>
+<body>
+<h1>Проверка ключа YouTube API</h1>
+<p>Вставь свой ключ и нажми кнопку. Ключ никуда не сохраняется.</p>
+<input id="key" type="password" placeholder="API-ключ">
+<button id="btn">Проверить</button>
+<div id="result"></div>
 
+<script>
+const btn = document.getElementById("btn");
+const result = document.getElementById("result");
+
+btn.addEventListener("click", async () => {
+  const key = document.getElementById("key").value.trim();
+  if (!key) {
+    result.textContent = "Сначала вставь ключ.";
+    return;
+  }
+  result.textContent = "Проверяю...";
+  try {
+    const url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=dQw4w9WgXcQ&key=" + encodeURIComponent(key);
+    const response = await fetch(url);
+    const data = await response.json();
+    if (!response.ok) {
+      result.textContent = "Ошибка: " + (data.error && data.error.message ? data.error.message : response.status);
+      return;
+    }
+    if (data.items && data.items.length > 0) {
+      result.textContent = "Ключ работает. Тестовое видео: " + data.items[0].snippet.title;
+    } else {
+      result.textContent = "Ключ принят, но видео не найдено.";
+    }
+  } catch (e) {
+    result.textContent = "Не удалось выполнить запрос: " + e.message;
+  }
+});
+</script>
+</body>
+</html>
